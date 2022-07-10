@@ -1,32 +1,22 @@
 const axios = require("axios");
+const BASE_URL = "http://localhost:5000";
+const constellationsUrl = `${BASE_URL}/constellations`;
 
-const url = "http://localhost:5000/constellations";
+const leo = {
+  name: "Leo",
+  meaning: "Lion",
+  starsWithPlanets: 19,
+  quadrant: "NQ2",
+};
+
 axios
-  .get(url)
-  .then((response) => {
-    const result = response.data.filter((constellation) => {
-      return constellation.starsWithPlanets < 10;
-    })
-    console.log(result);
+  .get(constellationsUrl)
+  .then(({ data }) => {
+    return data.find(({ name }) => name === leo.name);
   })
-  .catch((error) => {
-    console.log(error.message);
-  });
-
-
-  const url = "http://localhost:5000/constellations";
-axios
-  .post(url, {
-    name: "Ara",
-    meaning: "Altar",
-    starsWithPlanets: 7,
-    quadrant: "SQ3",
+  .then((exists) => {
+    if (exists) throw `Constellation "${leo.name}" already exists.`;
+    return axios.post(constellationsUrl, leo);
   })
-  .then((response) => {
-    console.log(response.data);
-  });
-
-const idToDelete = "ctvVRjy";
-axios.delete(`${url}/${idToDelete}`);
-
-axios.get(`${url}/${idToDelete}`);
+  .then(({ data }) => console.log(data))
+  .catch(console.log);
